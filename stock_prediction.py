@@ -29,18 +29,10 @@ from load_dataset import load_data
 # If so, load the saved data
 # If not, save the data into a directory
 #------------------------------------------------------------------------------
-# DATA_SOURCE = "yahoo"
 
-# COMPANY = 'CBA.AX'
-
-# TRAIN_START = '2020-01-01'     # Start date to read
-# TRAIN_END = '2023-08-01'       # End date to read
-
-
-# data = web.DataReader(COMPANY, DATA_SOURCE, TRAIN_START, TRAIN_END) # Read data using yahoo
-
-load_data()
-
+df = load_data()
+x_train = df['X_train']
+y_train = df['y_train']
 
 
 
@@ -61,7 +53,7 @@ PRICE_VALUE = "Close"
 scaler = MinMaxScaler(feature_range=(0, 1)) 
 # Note that, by default, feature_range=(0, 1). Thus, if you want a different 
 # feature_range (min,max) then you'll need to specify it here
-scaled_data = scaler.fit_transform(data[PRICE_VALUE].values.reshape(-1, 1)) 
+# scaled_data = scaler.fit_transform(data[PRICE_VALUE].values.reshape(-1, 1)) 
 # Flatten and normalise the data
 # First, we reshape a 1D array(n) to 2D array(n,1)
 # We have to do that because sklearn.preprocessing.fit_transform()
@@ -81,21 +73,18 @@ scaled_data = scaler.fit_transform(data[PRICE_VALUE].values.reshape(-1, 1))
 PREDICTION_DAYS = 60 # Original
 
 # To store the training data
-x_train = []
-y_train = []
+# x_train = []
+# y_train = []
 
-scaled_data = scaled_data[:,0] # Turn the 2D array back to a 1D array
+# scaled_data = scaled_data[:,0] # Turn the 2D array back to a 1D array
 # Prepare the data
-for x in range(PREDICTION_DAYS, len(scaled_data)):
-    x_train.append(scaled_data[x-PREDICTION_DAYS:x])
-    y_train.append(scaled_data[x])
 
 # Convert them into an array
-x_train, y_train = np.array(x_train), np.array(y_train)
+
 # Now, x_train is a 2D array(p,q) where p = len(scaled_data) - PREDICTION_DAYS
 # and q = PREDICTION_DAYS; while y_train is a 1D array(p)
 
-x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
+
 # We now reshape x_train into a 3D array(p, q, 1); Note that x_train 
 # is an array of p inputs with each input being a 2D array 
 
@@ -179,6 +168,7 @@ model.fit(x_train, y_train, epochs=25, batch_size=32)
 # your pre-trained model and run it on the new input for which the prediction
 # need to be made.
 
+
 #------------------------------------------------------------------------------
 # Test the model accuracy on existing data
 #------------------------------------------------------------------------------
@@ -188,7 +178,7 @@ TEST_END = '2024-07-02'
 
 # test_data = web.DataReader(COMPANY, DATA_SOURCE, TEST_START, TEST_END)
 
-test_data = yf.download(COMPANY,TEST_START,TEST_END)
+test_data = yf.download('CBA.AX',TEST_START,TEST_END)
 
 
 # The above bug is the reason for the following line of code
@@ -242,6 +232,7 @@ predicted_prices = scaler.inverse_transform(predicted_prices)
 # 2) Chart showing High & Lows of the day
 # 3) Show chart of next few days (predicted)
 #------------------------------------------------------------------------------
+COMPANY = 'CBA.AX'
 
 plt.plot(actual_prices, color="black", label=f"Actual {COMPANY} Price")
 plt.plot(predicted_prices, color="green", label=f"Predicted {COMPANY} Price")
