@@ -7,15 +7,6 @@
 # Youtuble link: https://www.youtube.com/watch?v=PuZY9q-aKLw
 # By: NeuralNine
 
-# Need to install the following (best in a virtual env):
-# pip install numpy
-# pip install matplotlib
-# pip install pandas
-# pip install tensorflow
-# pip install scikit-learn
-# pip install pandas-datareader
-# pip install yfinance
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -27,6 +18,8 @@ from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, LSTM, InputLayer
 
+import yfinance as yf
+
 #------------------------------------------------------------------------------
 # Load Data
 ## TO DO:
@@ -35,18 +28,18 @@ from tensorflow.keras.layers import Dense, Dropout, LSTM, InputLayer
 # If not, save the data into a directory
 #------------------------------------------------------------------------------
 # DATA_SOURCE = "yahoo"
-COMPANY = 'CBA.AX'
 
-TRAIN_START = '2020-01-01'     # Start date to read
-TRAIN_END = '2023-08-01'       # End date to read
+# COMPANY = 'CBA.AX'
+
+# TRAIN_START = '2020-01-01'     # Start date to read
+# TRAIN_END = '2023-08-01'       # End date to read
+
 
 # data = web.DataReader(COMPANY, DATA_SOURCE, TRAIN_START, TRAIN_END) # Read data using yahoo
 
 
-import yfinance as yf
 
 # Get the data for the stock AAPL
-data = yf.download(COMPANY,TRAIN_START,TRAIN_END)
 
 #------------------------------------------------------------------------------
 # Prepare Data
@@ -112,7 +105,7 @@ model = Sequential() # Basic neural network
 # See: https://www.tensorflow.org/api_docs/python/tf/keras/Sequential
 # for some useful examples
 
-model.add(LSTM(units=50, return_sequences=True, input_shape=(x_train.shape[1], 1)))
+model.add(LSTM(units=256, return_sequences=True, input_shape=(x_train.shape[1], 1)))
 # This is our first hidden layer which also spcifies an input layer. 
 # That's why we specify the input shape for this layer; 
 # i.e. the format of each training example
@@ -135,12 +128,12 @@ model.add(Dropout(0.2))
 # rate (= 0.2 above) at each step during training time, which helps 
 # prevent overfitting (one of the major problems of ML). 
 
-model.add(LSTM(units=50, return_sequences=True))
+model.add(LSTM(units=256, return_sequences=True))
 # More on Stacked LSTM:
 # https://machinelearningmastery.com/stacked-long-short-term-memory-networks/
 
 model.add(Dropout(0.2))
-model.add(LSTM(units=50))
+model.add(LSTM(units=256))
 model.add(Dropout(0.2))
 
 model.add(Dense(units=1)) 
