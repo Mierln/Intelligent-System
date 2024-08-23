@@ -20,6 +20,8 @@ from tensorflow.keras.layers import Dense, Dropout, LSTM, InputLayer
 
 import yfinance as yf
 
+from load_dataset import load_data
+
 #------------------------------------------------------------------------------
 # Load Data
 ## TO DO:
@@ -36,6 +38,10 @@ import yfinance as yf
 
 
 # data = web.DataReader(COMPANY, DATA_SOURCE, TRAIN_START, TRAIN_END) # Read data using yahoo
+
+load_data()
+
+
 
 
 

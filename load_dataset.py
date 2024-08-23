@@ -5,7 +5,7 @@ from os.path import exists
 from sklearn.model_selection import train_test_split
 
 
-def load_dataset():
+def load_data():
     
     company = input("Enter Company Name: ")
     start = input("Enter Start Date (YYYY-MM-DD): ")
