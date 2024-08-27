@@ -129,6 +129,3 @@ def scaler_function(column):
     # Returning the scaler to inverse fit
     # Returning the scaled dataframe
     return scaler, scaled_data
-
-
-print(load_data())

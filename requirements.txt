@@ -6,3 +6,4 @@ pandas
 requests
 pandas_datareader
 yfinance
+mplfinance
