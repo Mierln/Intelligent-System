@@ -12,7 +12,17 @@ from tensorflow.keras.layers import Dense, Dropout, LSTM, InputLayer
 import yfinance as yf
 
 from load_dataset import load_data
+from model import create_model
 
+data = load_data()
+
+
+
+
+
+
+
+'''
 df = load_data()
 x_train = df['X_train']
 y_train = df['y_train']
@@ -22,17 +32,7 @@ PRICE_VALUE = "Close"
 scaler = MinMaxScaler(feature_range=(0, 1)) 
 PREDICTION_DAYS = 60 # Original
 
-model = Sequential() # Basic neural network
-
-model.add(LSTM(units=256, return_sequences=True, input_shape=(x_train.shape[1], 1)))
-model.add(Dropout(0.2))
-model.add(LSTM(units=256, return_sequences=True))
-model.add(Dropout(0.2))
-model.add(LSTM(units=256))
-model.add(Dropout(0.2))
-model.add(Dense(units=1)) 
-model.compile(optimizer='adam', loss='mean_squared_error')
-
+model = create_model()
 model.fit(x_train, y_train, epochs=25, batch_size=32)
 
 # Load the test data
@@ -79,3 +79,4 @@ real_data = np.reshape(real_data, (real_data.shape[0], real_data.shape[1], 1))
 prediction = model.predict(real_data)
 prediction = scaler.inverse_transform(prediction)
 print(f"Prediction: {prediction}")
+'''
