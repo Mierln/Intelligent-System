@@ -1,19 +1,16 @@
-from tensorflow.keras.layers import LSTM
+from tensorflow.keras.layers import LSTM, RNN, GRU
 
 # Window size or the sequence length
-N_STEPS = 50
+N_STEPS = 60
 # Lookup step, 1 is the next day
 LOOKUP_STEP = 1
 
 # whether to scale feature columns & output price as well
 SCALE = True
-scale_str = f"sc-{int(SCALE)}"
 # whether to shuffle the dataset
-SHUFFLE = True
-shuffle_str = f"sh-{int(SHUFFLE)}"
+SHUFFLE = False
 # whether to split the training/testing set by date
-SPLIT_BY_DATE = False
-split_by_date_str = f"sbd-{int(SPLIT_BY_DATE)}"
+SPLIT_BY_DATE = True
 # test ratio size, 0.2 is 20%
 TEST_SIZE = 0.2
 # features to use
@@ -21,7 +18,7 @@ FEATURE_COLUMNS = ["Adj Close", "Close", "Open", "High", "Low"]
 
 ### model parameters
 
-N_LAYERS = 4
+N_LAYERS = 3
 # LSTM cell
 CELL = LSTM
 # 256 LSTM neurons
@@ -36,7 +33,7 @@ BIDIRECTIONAL = False
 # mean absolute error loss
 # LOSS = "mae"
 # huber loss
-LOSS = "huber_loss"
+LOSS = "mae"
 OPTIMIZER = "adam"
 BATCH_SIZE = 64
-EPOCHS = 10
+EPOCHS = 20
