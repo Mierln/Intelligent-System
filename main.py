@@ -64,8 +64,7 @@ def main():
     # get the final dataframe for the testing set
     final_df = get_final_df(model, data)
     
-    # predict the future price
-    future_price = predict(model, data)
+    
 
     # we calculate the accuracy by counting the number of positive profits
     accuracy_score = (
@@ -84,7 +83,11 @@ def main():
     profit_per_trade = total_profit / len(final_df)
     
     # printing metrics
-    print(f"Future price after {LOOKUP_STEP} days is {future_price:.2f}$")
+    print("")
+    
+    predict(model, data, k_days=5)
+    
+    print("")
     print(f"{LOSS} loss:", loss)
     print("Mean Absolute Error:", mean_absolute_error)
     print("Accuracy score:", accuracy_score)
@@ -94,10 +97,7 @@ def main():
     print("Profit per trade:", profit_per_trade)
 
     # plot true/pred prices graph
-
     plot_graph(final_df)
-
-    print(final_df.tail(10))
 
 
 if __name__ == "__main__":

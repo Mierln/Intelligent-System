@@ -71,27 +71,72 @@ def create_model(
     return model
 
 
-def predict(model, data):
+def predict(model, data, k_days):
     '''
     This function takes the trained model and data as the input
     and by using the parameters it will get the last sequence and
     predict that last sequence. If the data was scaled to begin with,
     it will inverse transform the data back to the original price.
     ''' 
+    feature_columns = FEATURE_COLUMNS
+    
+    index_of_close = feature_columns.index("Close")
+    index_of_open = feature_columns.index("Open")
+    index_of_high = feature_columns.index("High")
+    index_of_low = feature_columns.index("Low")
+    index_of_volume = feature_columns.index("Volume")
     
     # retrieve the last sequence from data
     last_sequence = data["last_sequence"][-N_STEPS:]
     # expand dimension
     last_sequence = np.expand_dims(last_sequence, axis=0)
-    # get the prediction (scaled from 0 to 1)
-    prediction = model.predict(last_sequence)
+    
+    predictions = []
+    
+    for i in range(k_days):
+    # Expand dimensions to match model input shape
+        # Make the prediction (scaled)
+        prediction = model.predict(last_sequence)
+        
+        # Inverse transform the prediction to get the actual price
+        if SCALE:
+            predicted_price = data["column_scaler"]["Close"].inverse_transform(prediction)[0][0]
+        else:
+            predicted_price = prediction[0][0]
+        # Append the predicted price to the predictions list
+        predictions.append(predicted_price)
+        
+        # Scale the predicted price before adding it to last_sequence
+        if SCALE:
+            scaled_predicted_price = data["column_scaler"]["Close"].transform([[predicted_price]])[0][0]
+        else:
+            scaled_predicted_price = predicted_price
+        
+        last_known_values = last_sequence[-1]
+    
+        new_entry = np.copy(last_known_values)
+        # Update the "Close" price
+        new_entry[index_of_close] = scaled_predicted_price
+        new_entry[index_of_open] = new_entry[index_of_close]
+        
+        percentage = 0.01  # 1% for example
+        
+        new_entry[index_of_high] = new_entry[index_of_close] * (1 + percentage)
+        new_entry[index_of_low] = new_entry[index_of_close] * (1 - percentage)
+        
+        new_entry[index_of_volume] = last_known_values[index_of_volume]
 
-    # get the price (by inverting the scaling)
-    if SCALE:
-        predicted_price = data["column_scaler"]["Close"].inverse_transform(prediction)[
-            0
-        ][0]
-    else:
-        predicted_price = prediction[0][0]
+        # Optionally, update other features if you have logic
+        # For example, if you have a method to estimate "Open", "High", "Low", etc.
 
-    return predicted_price
+
+        # Update last_sequence
+        last_sequence = np.append(last_sequence[1:], [new_entry], axis=0)
+        
+        # Update last_sequence by appending the new predicted price and removing the oldest one
+        
+
+    # Print the future prices
+    for idx, future_price in enumerate(predictions, 1):
+        print(f"Future price after {idx} days is {future_price:.2f}$")
+    
