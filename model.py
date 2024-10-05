@@ -94,7 +94,6 @@ def predict(model, data, k_days):
     predictions = []
     
     for i in range(k_days):
-    # Expand dimensions to match model input shape
         # Make the prediction (scaled)
         prediction = model.predict(last_sequence)
         
@@ -115,6 +114,7 @@ def predict(model, data, k_days):
         last_known_values = last_sequence[-1]
     
         new_entry = np.copy(last_known_values)
+        
         # Update the "Close" price
         new_entry[index_of_close] = scaled_predicted_price
         new_entry[index_of_open] = new_entry[index_of_close]
@@ -126,15 +126,8 @@ def predict(model, data, k_days):
         
         new_entry[index_of_volume] = last_known_values[index_of_volume]
 
-        # Optionally, update other features if you have logic
-        # For example, if you have a method to estimate "Open", "High", "Low", etc.
-
-
         # Update last_sequence
-        last_sequence = np.append(last_sequence[1:], [new_entry], axis=0)
-        
-        # Update last_sequence by appending the new predicted price and removing the oldest one
-        
+        last_sequence = np.append(last_sequence[1:], [new_entry], axis=0)  
 
     # Print the future prices
     for idx, future_price in enumerate(predictions, 1):

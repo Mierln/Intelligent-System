@@ -14,7 +14,7 @@ SPLIT_BY_DATE = False
 # test ratio size, 0.2 is 20%
 TEST_SIZE = 0.2
 # features to use
-FEATURE_COLUMNS = ["Adj Close", "Close", "Open", "High", "Low", "Volume"]
+FEATURE_COLUMNS = ["Close", "Open", "High", "Low", "Volume"]
 
 ### model parameters
 

@@ -85,7 +85,7 @@ def main():
     # printing metrics
     print("")
     
-    predict(model, data, k_days=5)
+    predict(model, data, k_days=7)
     
     print("")
     print(f"{LOSS} loss:", loss)
