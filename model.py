@@ -4,6 +4,8 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Bidirectional
 
+from statsmodels.tsa.arima.model import ARIMA
+
 # Importing parameters
 from parameters import *
 
@@ -77,7 +79,8 @@ def predict(model, data, k_days):
     and by using the parameters it will get the last sequence and
     predict that last sequence. If the data was scaled to begin with,
     it will inverse transform the data back to the original price.
-    ''' 
+    '''
+    
     feature_columns = FEATURE_COLUMNS
     
     index_of_close = feature_columns.index("Close")
@@ -94,16 +97,23 @@ def predict(model, data, k_days):
     predictions = []
     
     for i in range(k_days):
+        
+        
         # Make the prediction (scaled)
         prediction = model.predict(last_sequence)
+        arima_prediction = [predict_arima(last_sequence)]
         
         # Inverse transform the prediction to get the actual price
         if SCALE:
             predicted_price = data["column_scaler"]["Close"].inverse_transform(prediction)[0][0]
+            arima_prediction =  data["column_scaler"]["Close"].inverse_transform(arima_prediction)[0][0]
         else:
             predicted_price = prediction[0][0]
+            arima_prediction = arima_prediction[0]
+            
         # Append the predicted price to the predictions list
-        predictions.append(predicted_price)
+        
+        predictions.append((predicted_price + arima_prediction) / 2)
         
         # Scale the predicted price before adding it to last_sequence
         if SCALE:
@@ -132,4 +142,19 @@ def predict(model, data, k_days):
     # Print the future prices
     for idx, future_price in enumerate(predictions, 1):
         print(f"Future price after {idx} days is {future_price:.2f}$")
+
+def predict_arima(data):
     
+    '''
+    Function will train the ARIMA model based on the last_Sequence data
+    and it will predict the next day from N_Steps
+    '''
+    
+    close_value = data[:, :, 0][0] # Getting the closing values from the data
+    
+    arima_model = ARIMA(close_value, order=(N_STEPS-1,0,0)) # Creating the model
+    arima_model_fit = arima_model.fit() # Training the model
+    
+    predictions = arima_model_fit.forecast(steps=1) # Predicting the model
+    
+    return predictions

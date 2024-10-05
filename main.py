@@ -4,7 +4,6 @@ from model import create_model, predict
 from plotting import plotit, plot_graph
 from parameters import *
 
-
 def main():
     """
     This function is the main function that when run will go over data retrieving
@@ -26,7 +25,7 @@ def main():
 
     # Plotting the data in candlestick format
     # plotit(data["path"], n_days=30)
-
+  
     # Creating the model with the parameters imported from the parameters file
     model = create_model(
         N_STEPS,
@@ -40,7 +39,7 @@ def main():
         bidirectional=BIDIRECTIONAL,
     )
 
-    # Training the model with parameters imported from the parameters file
+    # Training the LSTM model with parameters imported from the parameters file
     model.fit(
         data["X_train"],
         data["y_train"],
@@ -49,7 +48,7 @@ def main():
         validation_data=(data["X_test"], data["y_test"]),
         verbose=1,
     )
-
+    
     # evaluate the model
     loss, mae = model.evaluate(data["X_test"], data["y_test"], verbose=0)
 
