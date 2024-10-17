@@ -8,3 +8,4 @@ pandas_datareader
 yfinance
 mplfinance
 statsmodels
+pytrends

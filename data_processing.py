@@ -1,4 +1,5 @@
 import yfinance as yf
+from pytrends.request import TrendReq
 import pandas as pd
 import numpy as np
 from os.path import exists
@@ -8,6 +9,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 
 from parameters import *
+
+pytrends = TrendReq(hl='en-US', tz=360)
 
 
 def load_data(
@@ -135,10 +138,14 @@ def get_data():
 
     else:
         data["data"] = yf.download(company, start, end)
-        save = input("Do you want to save? (Y/n): ")
-
-        if save.upper() == "Y" or save.upper() == "":
-            data["data"].to_csv(path)
+        
+        trend_data = get_trends_data(company, start, end)
+        data["data"] = data["data"].merge(trend_data, left_index=True, right_index=True, how='left')
+        data["data"].fillna(method='ffill', inplace=True)
+        
+        data["data"].rename(columns={company: 'Trend'}, inplace=True)
+        
+        data["data"].to_csv(path)
 
     return data
 
@@ -225,3 +232,32 @@ def get_final_df(model, data):
     )
 
     return final_df
+
+def get_trends_data(keyword, start_date, end_date):
+    timeframe = f'{start_date} {end_date}'
+    
+    pytrends.build_payload([keyword], cat=0, timeframe=timeframe, geo='', gprop='')
+    trends_data = pytrends.interest_over_time()
+    
+    if not trends_data.empty:
+        trends_data = trends_data.drop(columns=['isPartial'])
+        return trends_data
+    else:
+        print("No data found for the given timeframe and keyword.")
+        return pd.DataFrame()
+
+
+
+
+# Testing
+# stock_data = pd.read_csv("./saved_data/TSLA_2024-08-30_2024-09-30.csv")
+# stock_data['Date'] = pd.to_datetime(stock_data['Date'])
+# stock_data.set_index('Date', inplace=True)
+# print(stock_data.head(5))
+
+# trends_data = get_trends_data('TSLA', '2024-08-30', '2024-09-30')
+# print(trends_data.head(5))
+
+# merged_data = stock_data.merge(trends_data, left_index=True, right_index=True, how='left')
+# merged_data.fillna(method='ffill', inplace=True)
+# print(merged_data.head(10))
